@@ -1,0 +1,378 @@
+'use client'
+
+import { useState, useEffect } from 'react'
+import { Clock, Search, Moon, Sun } from 'lucide-react'
+import { Button } from "@/components/ui/button"
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import { Skeleton } from "@/components/ui/skeleton"
+import { ScrollArea } from "@/components/ui/scroll-area"
+import { Input } from "@/components/ui/input"
+import { Switch } from "@/components/ui/switch"
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table"
+
+// Icon components
+const IconBackupRecovery = () => <span>🔄</span>
+const IconDisasterRecovery = () => <span>🚨</span>
+const IconCloudSecurity = () => <span>☁️🔒</span>
+const IconIdentityAccessManagement = () => <span>🔑</span>
+const IconIntrusionDetection = () => <span>🕵️</span>
+const IconEndpointSecurity = () => <span>💻🛡️</span>
+const IconMessagingSecurity = () => <span>📧🔒</span>
+const IconSoC = () => <span>🎛️</span>
+const IconNetworkSecurity = () => <span>🌐🔒</span>
+const IconSecureAccessServiceEdge = () => <span>🔐</span>
+const IconSecurityAwarenessTraining = () => <span>🎓🛡️</span>
+const IconOrchestrationAutomationResponse = () => <span>🎭🤖</span>
+const IconMultiCloud = () => <span>☁️☁️</span>
+const IconFlashNVMe = () => <span>⚡💾</span>
+const IconObjectStorage = () => <span>📦</span>
+const IconSecondaryStorage = () => <span>💾</span>
+const IconHyperConverged = () => <span>🔄</span>
+const IconComposable = () => <span>🧩</span>
+const IconBigData = () => <span>📊</span>
+const IconAI = () => <span>🤖</span>
+const IconMachineLearning = () => <span>🧠</span>
+const IconMetadataManagement = () => <span>📑</span>
+const IconSDWAN = () => <span>🌐</span>
+const IconEdge = () => <span>📡</span>
+const IconSDN = () => <span>🕸️</span>
+const IconNetworkPerformance = () => <span>📈</span>
+const IconPublicCloud = () => <span>☁️</span>
+const IconPrivateCloud = () => <span>🏢☁️</span>
+const IconHybridCloud = () => <span>🏢☁️☁️</span>
+const IconTraditionalStorage = () => <span>💽</span>
+const IconContainers = () => <span>📦</span>
+const IconKubernetes = () => <span>⚓</span>
+const IconVirtualization = () => <span>💻➡️💻</span>
+const IconUnifiedEndpointManagement = () => <span>📱💻🔗</span>
+const IconEnterpriseManagement = () => <span>🏢📊</span>
+const IconContinuousIntegration = () => <span>🔄</span>
+const IconConfigurationManagement = () => <span>⚙️</span>
+const IconInfrastructureAsCode = () => <span>💻📝</span>
+const IconRegulatoryCompliance = () => <span>📜✅</span>
+const IconITAutomationOrchestration = () => <span>🤖🎭</span>
+const IconITInnovation = () => <span>💡</span>
+
+const categoryColors = {
+  "Data Protection": { main: "bg-blue-600", sub: "bg-blue-400" },
+  "Security": { main: "bg-rose-600", sub: "bg-rose-400" },
+  "Storage": { main: "bg-green-600", sub: "bg-green-400" },
+  "Integrated Systems": { main: "bg-yellow-600", sub: "bg-yellow-400" },
+  "Data Management": { main: "bg-purple-600", sub: "bg-purple-400" },
+  "Networking": { main: "bg-pink-600", sub: "bg-pink-400" },
+  "Cloud": { main: "bg-indigo-600", sub: "bg-indigo-400" },
+  "Systems": { main: "bg-red-600", sub: "bg-red-400" },
+  "End-User Computing": { main: "bg-orange-600", sub: "bg-orange-400" },
+  "DevOps": { main: "bg-teal-600", sub: "bg-teal-400" },
+  "IT Legal/Government": { main: "bg-gray-600", sub: "bg-gray-400" },
+  "IT Automation and Orchestration": { main: "bg-cyan-600", sub: "bg-cyan-400" },
+  "IT Innovation": { main: "bg-lime-600", sub: "bg-lime-400" },
+}
+
+const categories = {
+  "Data Protection": [
+    { name: "Backup & Recovery", icon: <IconBackupRecovery /> },
+    { name: "Disaster Recovery", icon: <IconDisasterRecovery /> },
+  ],
+  "Security": [
+    { name: "Cloud Security", icon: <IconCloudSecurity /> },
+    { name: "Identity Access Management", icon: <IconIdentityAccessManagement /> },
+    { name: "Intrusion Detection", icon: <IconIntrusionDetection /> },
+    { name: "Endpoint Security", icon: <IconEndpointSecurity /> },
+    { name: "Messaging Security", icon: <IconMessagingSecurity /> },
+    { name: "SoC", icon: <IconSoC /> },
+    { name: "Network Security", icon: <IconNetworkSecurity /> },
+    { name: "Secure Access Service Edge", icon: <IconSecureAccessServiceEdge /> },
+    { name: "Security Awareness Training", icon: <IconSecurityAwarenessTraining /> },
+    { name: "Orchestration Automation & Response", icon: <IconOrchestrationAutomationResponse /> },
+  ],
+  "Storage": [
+    { name: "Multi-Cloud", icon: <IconMultiCloud /> },
+    { name: "Flash & NVMe", icon: <IconFlashNVMe /> },
+    { name: "Object Storage", icon: <IconObjectStorage /> },
+    { name: "Secondary Storage", icon: <IconSecondaryStorage /> },
+  ],
+  "Integrated Systems": [
+    { name: "Hyper-converged", icon: <IconHyperConverged /> },
+    { name: "Composable", icon: <IconComposable /> },
+  ],
+  "Data Management": [
+    { name: "Big Data", icon: <IconBigData /> },
+    { name: "AI", icon: <IconAI /> },
+    { name: "Machine Learning", icon: <IconMachineLearning /> },
+    { name: "Metadata Management", icon: <IconMetadataManagement /> },
+  ],
+  "Networking": [
+    { name: "SD-WAN", icon: <IconSDWAN /> },
+    { name: "Edge", icon: <IconEdge /> },
+    { name: "SDN", icon: <IconSDN /> },
+    { name: "Network Performance", icon: <IconNetworkPerformance /> },
+  ],
+  "Cloud": [
+    { name: "Public Cloud", icon: <IconPublicCloud /> },
+    { name: "Private Cloud", icon: <IconPrivateCloud /> },
+    { name: "Hybrid Cloud", icon: <IconHybridCloud /> },
+    { name: "Traditional Storage", icon: <IconTraditionalStorage /> },
+  ],
+  "Systems": [
+    { name: "Containers", icon: <IconContainers /> },
+    { name: "Kubernetes", icon: <IconKubernetes /> },
+    { name: "Virtualization", icon: <IconVirtualization /> },
+  ],
+  "End-User Computing": [
+    { name: "Unified Endpoint Management", icon: <IconUnifiedEndpointManagement /> },
+    { name: "Enterprise Mobility Management", icon: <IconEnterpriseManagement /> },
+  ],
+  "DevOps": [
+    { name: "Continuous Integration", icon: <IconContinuousIntegration /> },
+    { name: "Configuration Management", icon: <IconConfigurationManagement /> },
+    { name: "Infrastructure as Code", icon: <IconInfrastructureAsCode /> },
+  ],
+  "IT Legal/Government": [
+    { name: "Regulatory Compliance", icon: <IconRegulatoryCompliance /> },
+  ],
+  "IT Automation and Orchestration": [
+    { name: "IT Automation and Orchestration", icon: <IconITAutomationOrchestration /> },
+  ],
+  "IT Innovation": [
+    { name: "IT Innovation", icon: <IconITInnovation /> },
+  ],
+}
+
+type Article = {
+  id: string
+  category: string
+  subcategory: string
+  title: string
+  description: string
+  source: {
+    name: string
+  }
+  publishedAt: string
+  url: string
+}
+
+const API_KEY = '3ed4765f38d244f19dc9dfcfb3704361'
+
+export default function Component() {
+  const [activeCategory, setActiveCategory] = useState('')
+  const [activeSubcategory, setActiveSubcategory] = useState('')
+  const [articles, setArticles] = useState<Article[]>([])
+  const [isLoading, setIsLoading] = useState(false)
+  const [lastUpdated, setLastUpdated] = useState<Date | null>(null)
+  const [searchTerm, setSearchTerm] = useState('')
+  const [isDarkMode, setIsDarkMode] = useState(false)
+
+  const fetchNews = async (query: string) => {
+    setIsLoading(true)
+    try {
+      const response = await fetch(`https://newsapi.org/v2/everything?q=${query}&apiKey=${API_KEY}&language=en&sortBy=publishedAt&pageSize=20`)
+      const data = await response.json()
+      if (data.status === 'ok') {
+        const fetchedArticles = data.articles.map((article: any, index: number) => ({
+          id: index.toString(),
+          category: activeCategory,
+          subcategory: activeSubcategory,
+          title: article.title,
+          description: article.description,
+          source: article.source,
+          publishedAt: article.publishedAt,
+          url: article.url
+        }))
+        setArticles(fetchedArticles)
+        setLastUpdated(new Date())
+      } else {
+        console.error('Error fetching news:', data.message)
+        setArticles([])
+      }
+    } catch (error) {
+      console.error('Error fetching news:', error)
+      setArticles([])
+    }
+    setIsLoading(false)
+  }
+
+  const handleCategorySearch = (category: string) => {
+    setActiveCategory(category)
+    setActiveSubcategory('')
+    fetchNews(`${category} IT`)
+  }
+
+  const handleSubcategorySearch = (category: string, subcategory: string) => {
+    setActiveCategory(category)
+    setActiveSubcategory(subcategory)
+    fetchNews(`${category} ${subcategory} IT`)
+  }
+
+  const handleAllCategoriesSearch = () => {
+    setActiveCategory('All Categories')
+    setActiveSubcategory('')
+    fetchNews('IT technology')
+  }
+
+  useEffect(() => {
+    if (searchTerm) {
+      const delayDebounceFn = setTimeout(() => {
+        fetchNews(searchTerm)
+      }, 500)
+      return () => clearTimeout(delayDebounceFn)
+    }
+  }, [searchTerm])
+
+  return (
+    <div className={`min-h-screen p-8 ${isDarkMode ? 'bg-gray-900 text-white' : 'bg-gradient-to-br from-blue-100 to-indigo-200'}`}>
+      <div className="max-w-7xl mx-auto">
+        <header className="text-center mb-12">
+          <h1 className={`text-5xl font-bold mb-4 ${isDarkMode ? 'text-white' : 'bg-clip-text text-transparent bg-gradient-to-r from-blue-600 to-indigo-600'}`}>
+            IT News Aggregator
+          </h1>
+          <p className={`text-xl ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>We play wherever core IT lives!</p>
+        </header>
+
+        <div className="flex justify-between items-center mb-4">
+          <div className="flex items-center space-x-2">
+            <Input
+              type="text"
+              placeholder="Search news..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              className="w-64"
+            />
+            <Search className="h-5 w-5 text-gray-500" />
+          </div>
+          <div className="flex items-center space-x-2">
+            <Sun className="h-5 w-5" />
+            <Switch
+              checked={isDarkMode}
+              onCheckedChange={setIsDarkMode}
+            />
+            <Moon className="h-5 w-5" />
+          </div>
+        </div>
+
+        <Card className={`${isDarkMode ? 'bg-gray-800 text-white' : 'bg-white'}`}>
+          <CardHeader className="pb-2">
+            <CardTitle className={`text-xl font-semibold ${isDarkMode ? 'text-white' : 'text-gray-800'}`}>Select a Category</CardTitle>
+          </CardHeader>
+          <CardContent className="pt-0">
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+              <div className="col-span-full mb-2">
+                <Button
+                  onClick={handleAllCategoriesSearch}
+                  variant={activeCategory === 'All Categories' ? "default" : "outline"}
+                  className={`w-full justify-start text-sm py-2 px-4 ${isDarkMode ? 'bg-blue-600 hover:bg-blue-700 text-white' : 'bg-blue-600 hover:bg-blue-700 text-white'}`}
+                >
+                  All Categories
+                </Button>
+              </div>
+              {Object.entries(categories).map(([category, subcategories]) => (
+                <div key={category} className={`p-2 ${isDarkMode ? 'bg-gray-700' : 'bg-gray-100'} rounded-lg`}>
+                  <h3 className={`text-sm font-semibold mb-2 ${isDarkMode ? 'text-white' :     'text-gray-800'} ${categoryColors[category].main} text-white p-1 rounded`}>{category}</h3>
+                  <div className="flex flex-col space-y-1">
+                    {subcategories.map((subcategory) => (
+                      <Button
+                        key={subcategory.name}
+                        onClick={() => handleSubcategorySearch(category, subcategory.name)}
+                        variant={(activeCategory === category && activeSubcategory === subcategory.name) ? "default" : "outline"}
+                        className={`w-full py-1 px-2 flex items-center justify-start text-left ${isDarkMode ? 'hover:bg-gray-500 text-white' : 'hover:bg-gray-200 text-gray-800'} ${categoryColors[category].sub}`}
+                        size="sm"
+                      >
+                        <span className="mr-2">{subcategory.icon}</span>
+                        <span className="text-xs font-bold">{subcategory.name}</span>
+                      </Button>
+                    ))}
+                  </div>
+                </div>
+              ))}
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card className={isDarkMode ? 'bg-gray-800 text-white mt-8' : 'bg-white mt-8'}>
+          <CardHeader className="flex flex-col sm:flex-row items-start sm:items-center justify-between border-b border-gray-200">
+            <div className="responsive-title flex items-center mb-2 sm:mb-0">
+              <CardTitle className={`text-2xl ${isDarkMode ? 'text-white' : 'text-gray-800'}`}>
+                {activeCategory ? (
+                  <>
+                    Top News in {activeCategory}
+                    {activeSubcategory ? ` - ${activeSubcategory}` : ''}
+                    <span className="total-count ml-2 text-sm font-normal">
+                      (Total found: {articles.length})
+                    </span>
+                  </>
+                ) : (
+                  'Select a category'
+                )}
+              </CardTitle>
+            </div>
+          </CardHeader>
+          <CardContent>
+            {lastUpdated && (
+              <div className={`text-sm ${isDarkMode ? 'text-gray-400' : 'text-gray-600'} flex items-center mb-4`}>
+                <Clock className="mr-1 h-4 w-4" />
+                Last updated: {lastUpdated.toLocaleTimeString()}
+              </div>
+            )}
+            {isLoading ? (
+              <div className="space-y-4">
+                {[...Array(5)].map((_, i) => (
+                  <Card key={i} className={isDarkMode ? 'bg-gray-700' : 'bg-gray-100'}>
+                    <CardContent className="p-4">
+                      <Skeleton className={`h-4 w-3/4 ${isDarkMode ? 'bg-gray-600' : 'bg-gray-300'} mb-2`} />
+                      <Skeleton className={`h-4 w-full ${isDarkMode ? 'bg-gray-600' : 'bg-gray-300'} mb-2`} />
+                      <Skeleton className={`h-4 w-2/3 ${isDarkMode ? 'bg-gray-600' : 'bg-gray-300'}`} />
+                    </CardContent>
+                  </Card>
+                ))}
+              </div>
+            ) : articles.length > 0 ? (
+              <ScrollArea className="h-[600px]">
+                <Table>
+                  <TableHeader>
+                    <TableRow className={isDarkMode ? 'border-gray-700' : 'bg-gray-100'}>
+                      <TableHead className={isDarkMode ? 'text-gray-300' : 'text-gray-800'}>Title</TableHead>
+                      <TableHead className={isDarkMode ? 'text-gray-300' : 'text-gray-800'}>Description</TableHead>
+                      <TableHead className={isDarkMode ? 'text-gray-300' : 'text-gray-800'}>Source</TableHead>
+                      <TableHead className={isDarkMode ? 'text-gray-300' : 'text-gray-800'}>Published Date</TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {articles.map((article) => (
+                      <TableRow key={article.id} className={isDarkMode ? 'border-gray-700 hover:bg-gray-700' : 'border-b border-gray-200 hover:bg-gray-50'}>
+                        <TableCell className={`font-medium ${isDarkMode ? 'text-white' : 'text-gray-800'}`}>
+                          <a href={article.url} target="_blank" rel="noopener noreferrer" className="hover:underline">
+                            {article.title}
+                          </a>
+                        </TableCell>
+                        <TableCell className={isDarkMode ? 'text-gray-300' : 'text-gray-700'}>
+                          {article.description}
+                        </TableCell>
+                        <TableCell className={isDarkMode ? 'text-gray-300' : 'text-gray-700'}>
+                          {article.source.name}
+                        </TableCell>
+                        <TableCell className={isDarkMode ? 'text-white' : 'text-gray-800'}>
+                          {new Date(article.publishedAt).toLocaleString()}
+                        </TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              </ScrollArea>
+            ) : activeCategory ? (
+              <p className={isDarkMode ? 'text-gray-300' : 'text-gray-700'}>No news found for {activeCategory}. Try another category or subcategory.</p>
+            ) : (
+              <p className={isDarkMode ? 'text-gray-300' : 'text-gray-700'}>Select a category or subcategory to see the latest IT news.</p>
+            )}
+          </CardContent>
+        </Card>
+      </div>
+    </div>
+  )
+}
